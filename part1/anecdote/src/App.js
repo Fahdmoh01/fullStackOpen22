@@ -15,6 +15,8 @@ const Button =({handleClick, text})=>{
 	)
 }
 
+
+
 const App = () => {
   const anecdotes = [
     'If it hurts, do it more often',
@@ -26,6 +28,7 @@ const App = () => {
     'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients'
   ]
    
+  
   const [selected, setSelected] = useState(0)
   const [votes, setVote] = useState([0,0,0,0,0,0,0])
 
