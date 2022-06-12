@@ -44,15 +44,7 @@ const addPerson =(event)=>{
  const handleSearch =(event)=>{
 	setShowAll(event.target.value)
  }
-
  showAll === '' ? displayAll = persons : displayAll = persons.filter(person => person.name.startsWith(showAll))
-
-//  if(showAll === ''){
-// 	displayAll = persons
-//  }else{
-// 	displayAll = persons.filter(person => person.name.includes(showAll))
-// 	console.log(displayAll)
-//  }
 
   return (
     <div>
