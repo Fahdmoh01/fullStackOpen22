@@ -1,17 +1,27 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 
+import axios from 'axios'
 const _= require('lodash')
 
 
 
 const App = () => {
-  const [persons, setPersons] = useState([{id:1, name: 'Arto Hellas', number: '040-1234567'}]) 
+  const [persons, setPersons] = useState([]) 
   const [newName, setNewName] = useState('')
   const [newPhoneNumber, setNewPhoneNumber] = useState('')
   const [showAll, setShowAll] = useState('')
+
+  const hook =() =>{
+	axios
+	  .get('http://localhost:3001/persons')
+	  .then(response =>{
+		setPersons(response.data)
+	  })
+  }
+  useEffect(hook,[])
 
 const addPerson =(event)=>{
 	event.preventDefault()
