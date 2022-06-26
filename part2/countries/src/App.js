@@ -17,6 +17,17 @@ const App = () => {
   }
   useEffect(hook,[])
   
+  const weatherHook =()=>{
+	axios
+	.get(`http://api.weatherstack.com/current?access_key={b09ca6e207dff7a6783a39b16517388}`)
+	.then(response =>  {
+		const weatherReport = response.data
+		console.log(weatherReport)
+		})
+  }
+
+  useEffect(weatherHook,[])
+
   const handleSearch =(event)=>{
 	setChosenCountry(event.target.value)
   }
