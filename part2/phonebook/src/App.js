@@ -3,7 +3,8 @@ import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import numberServices from './services/numbers'
-
+import Notification from './components/Notification'
+import './index.css'
 import axios from 'axios'
 //const _= require('lodash')
 
@@ -14,6 +15,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newPhoneNumber, setNewPhoneNumber] = useState('')
   const [showAll, setShowAll] = useState('')
+  const [message, setMessage] = useState(null)
+  const [messageColor, setMessageColor] = useState('green')
 
   const hook =() =>{
 	axios
@@ -41,8 +44,19 @@ const addPerson =(event)=>{
 				.then(returnedPerson =>{ 
 					setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
 					setNewName('')
+					setNewPhoneNumber('') 
+					setMessage(`${returnedPerson.name} number changed to ${returnedPerson.number}`)
+				}).catch(error => {
+					setMessage(`Information of ${person.name} has already been removed from server`)
+					setMessageColor('red')
+					setTimeout(() => {
+					  setMessage(null)
+					  setMessageColor('green')
+					}, 4000)
+					setPersons(persons.filter(p => p.id !== person.id))
+					setNewName('')
 					setNewPhoneNumber('')
-				})
+				  })
 		}
 
 	}else{
@@ -52,6 +66,10 @@ const addPerson =(event)=>{
 				setPersons(persons.concat(returnedNumber))
 				setNewName('')
 				setNewPhoneNumber('')
+				setMessage(`Added ${personObject.name}`)
+				setTimeout(() => {
+					setMessage(null)
+				  }, 4000)
 			})
 	}
 } 
@@ -63,10 +81,19 @@ const removePerson =(id) =>{
 			.deleteNumber(id)
 			.then(() =>{
 				setPersons(persons.filter(person =>  person.id !== id))
+				setMessage(`${removeName} has been deleted succesfully`)
+				setMessageColor('green')
 			})
 			.catch(
-				error => alert(`An Error Occurred while removing ${removeName}`,error)
-			)
+				error => {
+				setMessage(`An Error Occurred while removing ${removeName}`,error)
+				setMessageColor('red')
+       		  setTimeout(() => {
+         		 setMessage(null)
+         		 setMessageColor('green')
+        		}, 4000)
+        		setPersons(persons.filter(p => p.id !== id))
+      		})
 	}
 }
 
@@ -88,6 +115,7 @@ const removePerson =(id) =>{
   return (
     <div>
       <h2>Phonebook</h2>
+	  <Notification message={message} messageColor={messageColor}/>
 	  <Filter 
 	  	showAll={showAll} 
 	  	handleSearch={handleSearch}
