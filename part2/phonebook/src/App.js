@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import Persons from './components/Persons'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
+import numberServices from './services/numbers'
 
 import axios from 'axios'
-const _= require('lodash')
+//const _= require('lodash')
 
 
 
@@ -27,19 +28,47 @@ const addPerson =(event)=>{
 	event.preventDefault()
 	const personObject ={
 		name:newName,
-		number:newPhoneNumber,
-		id:persons.length + 1
+		number:newPhoneNumber
 	}
 
-	if(persons.some(person => _.isEqual(person.name,personObject.name) && _.isEqual(person.number,personObject.number) )){
-		alert(`${newName} is already added to phonebook`)
-		return
-	}
-	setPersons(persons.concat(personObject))
-	setNewName('')
-	setNewPhoneNumber('')
+	if(persons.some(person => person.name.toLowerCase() === newName.toLocaleLowerCase())){
+		if(window.confirm(`${personObject.name} is already added to phonebook, replace the old number with a new one?`)){
+			const person = persons.find(personDetails => personDetails.name === newName)
+			const changedPhoneNumber = {...person, number: newPhoneNumber}
 
+			numberServices
+				.updateNumber(person.id, changedPhoneNumber)
+				.then(returnedPerson =>{ 
+					setPersons(persons.map(p => p.id !== person.id ? p : returnedPerson))
+					setNewName('')
+					setNewPhoneNumber('')
+				})
+		}
+
+	}else{
+		numberServices
+			.createNumber(personObject)
+			.then( returnedNumber => {
+				setPersons(persons.concat(returnedNumber))
+				setNewName('')
+				setNewPhoneNumber('')
+			})
+	}
 } 
+
+const removePerson =(id) =>{
+	const removeName = persons.find(person => person.id === id).name
+	if(window.confirm(`Do you want to delete ${removeName}`)){
+		numberServices
+			.deleteNumber(id)
+			.then(() =>{
+				setPersons(persons.filter(person =>  person.id !== id))
+			})
+			.catch(
+				error => alert(`An Error Occurred while removing ${removeName}`,error)
+			)
+	}
+}
 
  const handleNameChange=(event)=>{
 	setNewName(event.target.value)
@@ -54,7 +83,7 @@ const addPerson =(event)=>{
  const handleSearch =(event)=>{
 	setShowAll(event.target.value)
  }
- showAll === '' ? displayAll = persons : displayAll = persons.filter(person => person.name.startsWith(showAll))
+ showAll === '' ? displayAll = persons : displayAll = persons.filter(person => person.name.toLowerCase().startsWith(showAll.toLowerCase()))
 
   return (
     <div>
@@ -72,7 +101,7 @@ const addPerson =(event)=>{
 		handlePhoneNumberChange={handlePhoneNumberChange}
 	   />
       <h2>Numbers</h2>
-	  <Persons displayAll={displayAll} />
+	  <Persons displayAll={displayAll} removePerson={removePerson} />
     </div>
   )
 }
