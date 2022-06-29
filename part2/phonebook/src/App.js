@@ -4,7 +4,7 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import personService from './services/persons'
 import Notification from './components/Notification'
-import './index.css'
+//import './index.css'
 //const _= require('lodash')
 
 
